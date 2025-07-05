@@ -2,6 +2,10 @@ name: Crawl
 
 on:
   push:
+    branches:
+      - 'master'
+    paths:
+      - '.github/workflows/crawl.yml'
   schedule:
     - cron: '0 5 * * *'
   workflow_dispatch:
