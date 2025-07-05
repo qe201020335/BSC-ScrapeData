@@ -1,0 +1,54 @@
+name: Crawl
+
+on:
+  push:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "qe201020335/BeatSpiderSharp"
+        ref: "dev"
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8
+    - name: Restore dependencies
+      run: dotnet restore BeatSpiderSharp.Cacher
+    - name: Build
+      run: dotnet build BeatSpiderSharp.Cacher -c Release --no-restore -o ./Build
+    - name: Run
+      run: ./Build/BeatSpiderSharp.Cacher -o cache.json.gz -z -r 250
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cache.json.gz
+        path: "./cache.json.gz"
+        if-no-files-found: error
+        retention-days: 1
+        compression-level: 0
+
+  upload:
+    needs: crawl
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Branch
+      run: git switch --orphan data && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+    - run: date +%s > timestamp.txt
+    - name: Commit Data
+      run: git add cache.json.gz timestamp.txt && git commit -m "Add data"
+    - name: Push Data
+      run: git push --force origin data
+
+      
+
