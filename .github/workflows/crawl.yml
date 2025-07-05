@@ -44,6 +44,9 @@ jobs:
       run: git switch --orphan data && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
     - name: Download Artifact
       uses: actions/download-artifact@v4
+      with:
+        name: cache.json.gz
+        merge-multiple: true
     - run: date +%s > timestamp.txt
     - name: Commit Data
       run: git add cache.json.gz timestamp.txt && git commit -m "Add data"
