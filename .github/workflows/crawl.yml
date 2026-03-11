@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: dotnet build BeatSpiderSharp.Cacher -c Release --no-restore -o ./Build
     - name: Run
-      run: ./Build/BeatSpiderSharp.Cacher -o cache.json.gz -z -r 250
+      run: ./Build/BeatSpiderSharp.Cacher -e -z -r 250 -o cache.json.gz 
     - uses: actions/upload-artifact@v4
       with:
         name: cache.json.gz
